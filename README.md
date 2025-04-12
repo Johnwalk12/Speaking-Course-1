@@ -6,7 +6,10 @@ This repository contains the design assets and functionality for the MySpeakCoac
 
 - `css/` - Contains all stylesheets
 - `js/` - Contains all JavaScript functionality
-- `html/` - Contains HTML templates and components
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Usage
 
@@ -18,6 +21,8 @@ To use these assets in your course pages, include the following in your HTML:
 
 <!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/gh/Johnwalk12/course-design-/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Johnwalk12/course-design-/js/quiz-system.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Johnwalk12/course-design-/js/voice-recording.js"></script>
 ```
 
 ## Integration with Hostinger
@@ -39,4 +44,8 @@ To update the course materials:
 This repository uses semantic versioning. When making significant changes:
 1. Update the version number in the jsDelivr URLs
 2. Create a new release in GitHub
-3. Update the URLs in your course pages if necessary 
+3. Update the URLs in your course pages if necessary
+
+## Note About Course Content
+
+The actual course content (HTML lessons) is stored in a separate private repository. This public repository contains only the shared functionality and styling that can be used by others under the MIT License. 
