@@ -7,7 +7,7 @@ const config = {
     navHeight: 60, // Height of navigation bar
     scrollTolerance: 50, // Scroll tolerance for nav state change
     smoothScrollDuration: 800, // Duration for smooth scrolling in ms
-    scrollDebounceTime: 16, // Debounce time for scroll events (16ms = 60fps)
+    scrollDebounceTime: 100, // Increased debounce time for better performance
     touchSwipeThreshold: 50, // Minimum distance for swipe detection
     touchSwipeTimeThreshold: 300, // Maximum time for swipe detection
     progressSaveInterval: 30000 // Save progress every 30 seconds
@@ -317,50 +317,69 @@ function setupNavigation() {
     });
 }
 
-// Scroll Handling
+// Improved scroll handling with debouncing
 function setupScrollHandling() {
-    // Use Intersection Observer for better performance
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && entry.intersectionRatio >= config.scrollThreshold) {
-                const sectionIndex = Array.from(sections).indexOf(entry.target);
-                updateActiveNavLink(sectionIndex);
-                updateNavIndicator(sectionIndex);
-                saveProgress(sectionIndex);
+    let isScrolling = false;
+    let scrollTimeout;
+    let lastScrollTop = 0;
+
+    const debouncedScroll = () => {
+        if (!isScrolling) {
+            isScrolling = true;
+            clearTimeout(scrollTimeout);
+
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+                const currentScroll = window.pageYOffset;
+                const nav = document.querySelector('.lesson-nav');
+
+                // Handle nav visibility
+                if (currentScroll > config.navHeight) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+
+                // Handle scroll direction
+                if (currentScroll > lastScrollTop && currentScroll > config.navHeight) {
+                    nav.style.transform = `translateY(-${config.navHeight}px)`;
+                } else {
+                    nav.style.transform = 'translateY(0)';
+                }
+
+                lastScrollTop = currentScroll;
+                updateActiveSection();
+            }, config.scrollDebounceTime);
+        }
+    };
+
+    window.addEventListener('scroll', debouncedScroll, { passive: true });
+}
+
+function updateActiveSection() {
+    const scrollPosition = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    // Prevent infinite scroll by checking if we're at the bottom
+    if (scrollPosition + windowHeight >= documentHeight - 100) {
+        return;
+    }
+
+    sections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top + window.scrollY;
+        const sectionHeight = rect.height;
+
+        if (scrollPosition >= sectionTop - config.navHeight &&
+            scrollPosition < sectionTop + sectionHeight - config.navHeight) {
+            if (config.currentSection !== index) {
+                config.currentSection = index;
+                updateActiveNavLink(index);
+                updateNavigationButtons();
+                saveProgress(index);
             }
-        });
-    }, {
-        threshold: config.scrollThreshold
-    });
-
-    sections.forEach(section => observer.observe(section));
-
-    // Add scroll behavior for navigation bar
-    window.addEventListener('scroll', () => {
-        // Debounce scroll events for better performance
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            const currentScroll = window.pageYOffset;
-            const nav = document.querySelector('.lesson-nav');
-
-            // Add/remove scrolled class based on scroll position
-            if (currentScroll > config.navHeight) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-
-            // Hide/show navigation based on scroll direction
-            if (currentScroll > lastScrollTop && currentScroll > config.navHeight) {
-                // Scrolling down
-                nav.style.transform = `translateY(-${config.navHeight}px)`;
-            } else {
-                // Scrolling up
-                nav.style.transform = 'translateY(0)';
-            }
-
-            lastScrollTop = currentScroll;
-        }, config.scrollDebounceTime);
+        }
     });
 }
 

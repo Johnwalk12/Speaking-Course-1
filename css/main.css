@@ -46,6 +46,9 @@ body {
     color: var(--text-primary);
     line-height: var(--line-height-base);
     font-size: var(--font-size-base);
+    overflow-x: hidden;
+    height: 100vh;
+    position: relative;
 }
 
 
@@ -56,11 +59,11 @@ body {
     margin: 0 auto;
     padding: var(--container-padding);
     width: 80%;
-    /* Desktop width */
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
     position: relative;
     padding-bottom: 4rem;
-    /* Add space for the footer */
+    scroll-behavior: smooth;
 }
 
 
@@ -98,6 +101,7 @@ body {
     padding: 0;
     transition: all 0.3s ease;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    height: 60px;
 }
 
 .nav-container {
@@ -367,12 +371,13 @@ body {
 /* Section Styles */
 
 .section {
+    margin-bottom: var(--section-spacing);
     background: var(--card-bg);
     border-radius: var(--border-radius);
-    padding: var(--content-spacing);
-    margin-bottom: var(--section-spacing);
     box-shadow: var(--card-shadow);
-    transition: all 0.3s ease;
+    overflow: hidden;
+    max-height: 100vh;
+    position: relative;
 }
 
 .section-header {
@@ -404,11 +409,11 @@ body {
 }
 
 .section-content {
-    transition: max-height var(--transition-normal), opacity var(--transition-normal);
-    overflow: hidden;
-    max-height: 2000px;
-    /* Adjust based on content */
-    opacity: 1;
+    padding: var(--content-spacing);
+    transition: max-height var(--transition-normal);
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    scroll-behavior: smooth;
 }
 
 .section-content.collapsed {
@@ -2669,7 +2674,6 @@ body {
     border-radius: 4px;
     font-size: 0.8rem;
     white-space: nowrap;
-    animation: fadeIn 0.3s ease;
 }
 
 
@@ -2687,8 +2691,6 @@ body {
     transition: all 0.3s ease;
     z-index: 1000;
     border: 1px solid rgba(255, 215, 0, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 
