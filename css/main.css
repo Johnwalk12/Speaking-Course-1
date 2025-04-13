@@ -2803,3 +2803,38 @@ html {
         overflow-y: scroll;
     }
 }
+
+
+/* Grid Embed Container Fixes */
+
+[data-v-8b938be5].grid-embed_iframe,
+.grid-embed_iframe {
+    width: 100% !important;
+    height: 100vh !important;
+    min-height: 800px !important;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    display: block;
+}
+
+[data-v-8b938be5].grid-embed,
+div[class*="grid-embed"] {
+    width: 100% !important;
+    height: 100vh !important;
+    min-height: 800px !important;
+    overflow: visible;
+    position: relative;
+    display: block;
+}
+
+
+/* Fix for Hostinger container */
+
+div[data-v-8b938be5][class*="layout-element_component--GridEmbed"] {
+    height: auto !important;
+    min-height: 800px !important;
+    overflow: visible;
+    position: relative;
+}
