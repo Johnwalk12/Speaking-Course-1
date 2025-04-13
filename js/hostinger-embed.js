@@ -143,3 +143,59 @@ if (window.location.href.includes('myspeakcoach.com')) {
         }
     }, true);
 }
+
+// Height Observer for iframe resizing
+function initHeightObserver() {
+    const resizeObserver = new ResizeObserver(debounce(entries => {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({
+            action: 'iframeHeightUpdated',
+            height: height,
+            id: document.querySelector('iframe').id || 'embedded-content'
+        }, '*');
+    }, 100));
+
+    resizeObserver.observe(document.body);
+}
+
+// Debounce function to prevent too many resize events
+function debounce(fn, delay) {
+    let timeoutId;
+    return function(...args) {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+        }, delay);
+    };
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initHeightObserver();
+
+    // Additional height adjustment on content changes
+    const contentObserver = new MutationObserver(debounce(() => {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({
+            type: 'setHeight',
+            height: height
+        }, '*');
+    }, 100));
+
+    contentObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true
+    });
+});
+
+// Handle window resize events
+window.addEventListener('resize', debounce(() => {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({
+        type: 'setHeight',
+        height: height
+    }, '*');
+}, 100));
