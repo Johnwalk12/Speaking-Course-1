@@ -5,17 +5,38 @@ window.addEventListener('message', function(event) {
 
     try {
         if (event.data && event.data.type === 'setHeight') {
-            const height = Math.max(parseInt(event.data.height) + 100, 800); // 100px buffer
+            // Calculate height with all possible measurements
+            const receivedHeight = parseInt(event.data.height);
+            const calculatedHeight = Math.max(
+                receivedHeight + 200, // Buffer space
+                window.innerHeight * 0.8, // At least 80% of viewport
+                800 // Minimum height
+            );
+
             const iframes = document.querySelectorAll('iframe[src*="myspeakcoach.com"]');
 
             iframes.forEach(iframe => {
-                // Update iframe height
-                iframe.style.height = height + 'px';
+                // Update iframe height with smooth transition
+                iframe.style.transition = 'all 0.3s ease-in-out';
+                iframe.style.height = calculatedHeight + 'px';
+                iframe.style.maxHeight = 'none';
+                iframe.style.display = 'block';
+                iframe.style.width = '100%';
+                iframe.style.minHeight = '800px';
 
                 // Update parent container if needed
                 const container = iframe.closest('.grid-embed, [class*="grid-embed"]');
                 if (container) {
-                    container.style.height = height + 'px';
+                    container.style.transition = 'all 0.3s ease-in-out';
+                    container.style.height = calculatedHeight + 'px';
+                    container.style.maxHeight = 'none';
+                    container.style.display = 'block';
+                    container.style.width = '100%';
+                    container.style.position = 'relative';
+                    container.style.overflow = 'visible';
+
+                    // Force layout recalculation
+                    container.style.minHeight = calculatedHeight + 'px';
                 }
             });
         }
@@ -24,47 +45,101 @@ window.addEventListener('message', function(event) {
     }
 });
 
-// Initial setup
+// Enhanced initial setup
 document.addEventListener('DOMContentLoaded', function() {
     const iframes = document.querySelectorAll('iframe[src*="myspeakcoach.com"]');
     iframes.forEach(iframe => {
-        // Set initial styles
-        iframe.style.width = '100%';
-        iframe.style.minHeight = '800px';
-        iframe.style.height = '800px';
-        iframe.style.border = 'none';
-        iframe.style.overflow = 'auto';
+        // Set comprehensive initial styles
+        const initialStyles = {
+            width: '100%',
+            minHeight: '800px',
+            height: 'auto',
+            border: 'none',
+            overflow: 'visible',
+            display: 'block',
+            margin: '0 auto',
+            transition: 'all 0.3s ease-in-out'
+        };
 
-        // Force parent container to proper dimensions
+        Object.assign(iframe.style, initialStyles);
+
+        // Enhanced container setup
         const container = iframe.closest('.grid-embed, [class*="grid-embed"]');
         if (container) {
-            container.style.width = '100%';
-            container.style.minHeight = '800px';
-            container.style.height = '800px';
-            container.style.overflow = 'visible';
+            const containerStyles = {
+                width: '100%',
+                minHeight: '800px',
+                height: 'auto',
+                overflow: 'visible',
+                maxHeight: 'none',
+                position: 'relative',
+                display: 'block',
+                margin: '0 auto',
+                transition: 'all 0.3s ease-in-out'
+            };
+
+            Object.assign(container.style, containerStyles);
         }
     });
 });
 
-// Send height to parent window
+// Enhanced height calculation
+function getMaxHeight() {
+    return Math.max(
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight,
+        document.documentElement.clientHeight,
+        document.body.scrollHeight,
+        document.body.offsetHeight
+    );
+}
+
+// Improved height monitoring
 function sendHeightToParent() {
-    const height = document.documentElement.scrollHeight;
+    const height = getMaxHeight();
     window.parent.postMessage({
         type: 'setHeight',
         height: height
     }, '*');
 }
 
-// Monitor height changes
+// Enhanced monitoring for myspeakcoach.com content
 if (window.location.href.includes('myspeakcoach.com')) {
-    // Send height on load and after any content changes
-    window.addEventListener('load', sendHeightToParent);
-    window.addEventListener('resize', sendHeightToParent);
-
-    // Monitor for dynamic content changes
-    const observer = new MutationObserver(sendHeightToParent);
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
+    // Initial height calculation after load
+    window.addEventListener('load', () => {
+        setTimeout(sendHeightToParent, 100); // Delay to ensure content is rendered
     });
+
+    // Monitor window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(sendHeightToParent, 100);
+    });
+
+    // Monitor content changes with ResizeObserver
+    const resizeObserver = new ResizeObserver(entries => {
+        sendHeightToParent();
+    });
+
+    resizeObserver.observe(document.body);
+
+    // Monitor DOM changes
+    const mutationObserver = new MutationObserver(() => {
+        setTimeout(sendHeightToParent, 50);
+    });
+
+    mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+    });
+
+    // Monitor image loads
+    document.addEventListener('load', function(e) {
+        if (e.target.tagName === 'IMG') {
+            sendHeightToParent();
+        }
+    }, true);
 }

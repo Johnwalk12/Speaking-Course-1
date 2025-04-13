@@ -2831,3 +2831,88 @@ div[data-v-8b938be5][class*="layout-element_component--GridEmbed"] {
     min-height: 800px !important;
     overflow: visible !important;
 }
+
+.grid-embed {
+    position: relative;
+    width: 100% !important;
+    min-height: 800px;
+    height: auto;
+    margin: 0 auto;
+    padding: 0;
+    overflow: visible !important;
+    transition: all 0.3s ease-in-out;
+    display: block;
+    box-sizing: border-box;
+}
+
+.grid-embed iframe,
+iframe[src*="myspeakcoach.com"] {
+    width: 100% !important;
+    min-height: 800px;
+    height: auto;
+    border: none;
+    margin: 0 auto;
+    padding: 0;
+    display: block;
+    overflow: visible !important;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+}
+
+
+/* Ensure proper sizing in all contexts */
+
+[class*="layout-element_component--GridEmbed"] {
+    height: auto !important;
+    min-height: 800px !important;
+    width: 100% !important;
+    overflow: visible !important;
+    position: relative !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
+
+
+/* Responsive adjustments */
+
+@media screen and (max-width: 768px) {
+    .grid-embed,
+    .grid-embed iframe,
+    iframe[src*="myspeakcoach.com"],
+    [class*="layout-element_component--GridEmbed"] {
+        min-height: 600px;
+        /* Smaller minimum height on mobile */
+    }
+}
+
+
+/* Ensure proper stacking context */
+
+.grid-embed {
+    z-index: 1;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+
+/* Prevent unwanted scrollbars */
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+
+/* Force hardware acceleration for smoother transitions */
+
+.grid-embed,
+.grid-embed iframe,
+iframe[src*="myspeakcoach.com"] {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: height;
+}
